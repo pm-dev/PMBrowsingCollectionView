@@ -10,7 +10,7 @@
 #define COCOAPODS_POD_AVAILABLE_PMBrowsingCollectionView
 #define COCOAPODS_VERSION_MAJOR_PMBrowsingCollectionView 0
 #define COCOAPODS_VERSION_MINOR_PMBrowsingCollectionView 0
-#define COCOAPODS_VERSION_PATCH_PMBrowsingCollectionView 1
+#define COCOAPODS_VERSION_PATCH_PMBrowsingCollectionView 2
 
 // PMCircularCollectionView
 #define COCOAPODS_POD_AVAILABLE_PMCircularCollectionView
@@ -22,5 +22,5 @@
 #define COCOAPODS_POD_AVAILABLE_PMUtils
 #define COCOAPODS_VERSION_MAJOR_PMUtils 0
 #define COCOAPODS_VERSION_MINOR_PMUtils 0
-#define COCOAPODS_VERSION_PATCH_PMUtils 39
+#define COCOAPODS_VERSION_PATCH_PMUtils 40
 
