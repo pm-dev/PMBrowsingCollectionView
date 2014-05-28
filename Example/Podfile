@@ -1,12 +1,3 @@
-# Uncomment this line to define a global platform for your project
-# platform :ios, '7.0'
+xcodeproj 'PMBrowsingCollectionView-iOSExample/PMBrowsingCollectionView-iOSExample.xcodeproj'
 
-target "Demo" do
-  pod "PMBrowsingCollectionView", :path => "../"
-end
-
-# Uncomment the following lines to add testing dependencies
-# target "DemoTests" do
-#   pod 'Expecta'
-# end
-
+pod "PMBrowsingCollectionView", :path => "../PMBrowsingCollectionView.podspec"
