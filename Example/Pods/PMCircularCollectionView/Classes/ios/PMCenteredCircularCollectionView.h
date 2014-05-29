@@ -20,7 +20,6 @@
 @end
 
 
-
 @interface PMCenteredCircularCollectionView : PMCircularCollectionView
 
 // Overwrite Type

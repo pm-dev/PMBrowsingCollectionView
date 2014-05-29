@@ -17,9 +17,12 @@ static NSUInteger const ContentMultiplier = 4;
     PMProtocolInterceptor *_delegateInterceptor;
     PMProtocolInterceptor *_dataSourceInterceptor;
     NSInteger _itemCount;
-    BOOL _implicitlyDisabled;
     BOOL _delegateRespondsToScrollViewDidScroll;
+    BOOL _delegateRespondsToSizeForItemAtIndexPath;
+    BOOL _delegateRespondsToMinimumInteritemSpacingForSectionAtIndex;
+    BOOL _delegateRespondsToMinimumLineSpacingForSectionAtIndex;
 }
+@property (nonatomic) BOOL circularImplicitlyDisabled;
 @end
 
 @implementation PMCircularCollectionView
@@ -80,10 +83,13 @@ static NSUInteger const ContentMultiplier = 4;
     self.showsVerticalScrollIndicator = NO;
 }
 
+#pragma mark  Overwritten Methods
+
 - (void)layoutSubviews {
     [super layoutSubviews];
     [self _recenterIfNecessary];
 }
+
 
 #pragma mark - Accessors
 
@@ -102,17 +108,9 @@ static NSUInteger const ContentMultiplier = 4;
     [super setDelegate:(id)_delegateInterceptor];
     
     _delegateRespondsToScrollViewDidScroll = [delegate respondsToSelector:@selector(scrollViewDidScroll:)];
-}
-
-- (void) setCircularDisabled:(BOOL)circularDisabled
-{
-    _explicitlyDisabled = circularDisabled;
-    _shadowLayer.hidden = self.circularDisabled;
-}
-
-- (BOOL) circularDisabled
-{
-    return _explicitlyDisabled || _implicitlyDisabled;
+    _delegateRespondsToSizeForItemAtIndexPath = [delegate respondsToSelector:@selector(collectionView:layout:sizeForItemAtIndexPath:)];
+    _delegateRespondsToMinimumInteritemSpacingForSectionAtIndex = [delegate respondsToSelector:@selector(collectionView:layout:minimumInteritemSpacingForSectionAtIndex:)];
+    _delegateRespondsToMinimumLineSpacingForSectionAtIndex = [delegate respondsToSelector:@selector(collectionView:layout:minimumLineSpacingForSectionAtIndex:)];
 }
 
 - (void) setShadowRadius:(CGFloat)shadowRadius
@@ -131,12 +129,34 @@ static NSUInteger const ContentMultiplier = 4;
     }
 }
 
-- (NSUInteger) normalizedIndexFromIndexPath:(NSIndexPath *)indexPath
+- (void) setCircularDisabled:(BOOL)circularDisabled
+{
+    _explicitlyDisabled = circularDisabled;
+    _shadowLayer.hidden = ![self circularActive];
+}
+
+- (void) setCircularImplicitlyDisabled:(BOOL)circularImplicitlyDisabled
+{
+    _circularImplicitlyDisabled = circularImplicitlyDisabled;
+    _shadowLayer.hidden = ![self circularActive];
+}
+
+
+#pragma mark - Public Methods
+
+
+- (BOOL) circularActive
+{
+    return !_explicitlyDisabled && !_circularImplicitlyDisabled;
+}
+
+- (NSUInteger) normalizeIndexFromIndexPath:(NSIndexPath *)indexPath
 {
     return indexPath.item % _itemCount;
 }
 
 #pragma mark - UICollectionViewDatasource Methods
+
 
 - (NSInteger) numberOfSectionsInCollectionView:(UICollectionView *)collectionView
 {
@@ -148,9 +168,8 @@ static NSUInteger const ContentMultiplier = 4;
     NSParameterAssert([collectionView isKindOfClass:[PMCircularCollectionView class]]);
     
     _itemCount = [_dataSourceInterceptor.receiver collectionView:collectionView numberOfItemsInSection:section];
-    _implicitlyDisabled = [self _disableCircularInternallyBasedOnContentSize];
-    
-    return self.circularDisabled? _itemCount : _itemCount * ContentMultiplier;
+    self.circularImplicitlyDisabled = [self _disableCircularInternallyBasedOnContentSize];
+    return [self circularActive]? _itemCount * ContentMultiplier : _itemCount;
 }
 
 
@@ -171,11 +190,13 @@ static NSUInteger const ContentMultiplier = 4;
     }
 }
 
+
 #pragma mark - Private Methods
+
 
 - (void) _recenterIfNecessary
 {
-    if (self.circularDisabled == NO) {
+    if ([self circularActive]) {
         
         CGPoint currentOffset = self.contentOffset;
         
@@ -255,33 +276,53 @@ static NSUInteger const ContentMultiplier = 4;
 
 - (BOOL) _disableCircularInternallyBasedOnContentSize
 {
-    CGSize contentSize = [self _calculateContentSize];
+    CGSize requiredContentSize = [self _calculateRequiredContentSize];
+    CGSize spacingSize = [self _calculateSpacingSize];
     
     switch (self.collectionViewLayout.scrollDirection)
     {
-        case UICollectionViewScrollDirectionHorizontal: return  contentSize.width < self.bounds.size.width;
-        case UICollectionViewScrollDirectionVertical: return contentSize.height < self.bounds.size.height;
+        case UICollectionViewScrollDirectionHorizontal: return  requiredContentSize.width + spacingSize.width < self.bounds.size.width;
+        case UICollectionViewScrollDirectionVertical: return requiredContentSize.height + spacingSize.height < self.bounds.size.height;
     }
 }
 
-- (CGSize) _calculateContentSize
+- (CGSize) _calculateRequiredContentSize
 {
     CGSize contentSize = CGSizeZero;
+    CGSize largestItem = CGSizeZero;
     
-    if ([self.delegate respondsToSelector:@selector(collectionView:layout:sizeForItemAtIndexPath:)]) {
+    if (_delegateRespondsToSizeForItemAtIndexPath) {
         for (NSUInteger i = 0; i < _itemCount; i++) {
             NSIndexPath *indexPath = [NSIndexPath indexPathForItem:i inSection:0];
             CGSize itemSize = [self.delegate collectionView:self layout:self.collectionViewLayout sizeForItemAtIndexPath:indexPath];
             contentSize.height += itemSize.height;
             contentSize.width += itemSize.width;
+            
+            if (itemSize.width > largestItem.width) {
+                largestItem.width = itemSize.width;
+            }
+            if (itemSize.height > largestItem.height) {
+                largestItem.height = itemSize.height;
+            }
         }
     }
     else {
         contentSize.height += self.collectionViewLayout.itemSize.height * _itemCount;
         contentSize.width += self.collectionViewLayout.itemSize.width * _itemCount;
+        largestItem = self.collectionViewLayout.itemSize;
     }
+    return CGSizeMake(contentSize.width - largestItem.width, contentSize.height - largestItem.height);
+}
+
+- (CGSize) _calculateSpacingSize
+{
+    CGFloat lineSpacing = _delegateRespondsToMinimumLineSpacingForSectionAtIndex? [self.delegate collectionView:self layout:self.collectionViewLayout minimumLineSpacingForSectionAtIndex:0] : (_itemCount * self.collectionViewLayout.minimumLineSpacing);
+    CGFloat interitemSpacing = _delegateRespondsToMinimumInteritemSpacingForSectionAtIndex? [self.delegate collectionView:self layout:self.collectionViewLayout minimumInteritemSpacingForSectionAtIndex:0] : (_itemCount * self.collectionViewLayout.minimumInteritemSpacing);
     
-    return contentSize;
+    switch (self.collectionViewLayout.scrollDirection) {
+        case UICollectionViewScrollDirectionVertical: return CGSizeMake(interitemSpacing, lineSpacing);
+        case UICollectionViewScrollDirectionHorizontal: return CGSizeMake(lineSpacing, interitemSpacing);
+    }
 }
 
 @end

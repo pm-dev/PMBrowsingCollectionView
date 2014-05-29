@@ -292,11 +292,11 @@ static inline NSString * PMReuseIdentifier(NSInteger index) {
     
 }
 
-- (NSIndexPath *) normalizedIndexPath:(NSIndexPath *)indexPath
+- (NSIndexPath *) normalizeIndexPath:(NSIndexPath *)indexPath
 {
     if (indexPath.section < _sections.count) {
         PMBrowsingCollectionViewSection *section = _sections[indexPath.section];
-        NSInteger itemIndex = [section.collectionView normalizedIndexFromIndexPath:indexPath];
+        NSInteger itemIndex = [section.collectionView normalizeIndexFromIndexPath:indexPath];
         NSIndexPath *normalizedIndexPath = [NSIndexPath indexPathForItem:itemIndex inSection:indexPath.section];
         return normalizedIndexPath;
     }
@@ -429,11 +429,7 @@ static inline NSString * PMReuseIdentifier(NSInteger index) {
 - (void) collectionView:(PMCenteredCircularCollectionView *)collectionView didSelectItemAtIndexPath:(NSIndexPath *)indexPath
 {
     if (_delegateImplementsDidSelectItemAtIndexPath) {
-
-//        NSInteger sectionIndex = [ [self sectionForCircularCollectionView:collectionView];
-//        NSUInteger itemIndex = [collectionView normalizedIndexFromIndexPath:indexPath];
-//        NSIndexPath *indexPath = [NSIndexPath indexPathForItem:itemIndex inSection:sectionIndex];
-
+        
         if (collectionView.circularDisabled == NO) {
 
             UICollectionViewLayoutAttributes *attributes = [collectionView.collectionViewLayout layoutAttributesForItemAtIndexPath:indexPath];
@@ -454,7 +450,7 @@ static inline NSString * PMReuseIdentifier(NSInteger index) {
 
 - (void) collectionView:(PMCenteredCircularCollectionView *)collectionView didCenterItemAtIndex:(NSUInteger)index
 {
-    if (_delegateImplementsDidCenterItemAtIndexPath) {
+    if (_delegateImplementsDidCenterItemAtIndexPath && collectionView.circularDisabled == NO) {
         NSIndexPath *indexPath = [NSIndexPath indexPathForItem:index inSection:[collectionView sectionIndex]];
         [_delegateInterceptor.receiver collectionView:self didCenterItemAtIndexPath:indexPath];
     }
@@ -466,7 +462,6 @@ static inline NSString * PMReuseIdentifier(NSInteger index) {
 - (void) _configureSection:(PMBrowsingCollectionViewSection *)section atIndex:(NSInteger)sectionIndex
 {
     _sections[sectionIndex] = section;
-    DLog(@"Adding section for index %d", sectionIndex);
     
     PMCenteredCollectionViewFlowLayout *layout = [PMCenteredCollectionViewFlowLayout new];
     layout.minimumLineSpacing = self.collectionViewLayout.minimumLineSpacing;

@@ -11,7 +11,7 @@
 
 @interface PMCenteredCircularCollectionView ()
 {
-    id<PMCenteredCircularCollectionViewDelegate> _originalDelegate;
+    __weak id<PMCenteredCircularCollectionViewDelegate> _originalDelegate;
     BOOL _delegateRespondsToDidCenterItemAtIndex;
     BOOL _delegateRespondsToDidSelectItemAtIndexPath;
     BOOL _delegateRespondsToScrollViewDidEndDecelerating;
@@ -33,42 +33,9 @@
     return self;
 }
 
-- (void) centerCell:(UICollectionViewCell *)cell animated:(BOOL)animated;
-{
-    NSIndexPath *indexPath = [self indexPathForCell:cell];
-    [self centerCellAtIndex:indexPath.item animated:animated];
-}
 
-- (void) centerCellAtIndex:(NSUInteger)index animated:(BOOL)animated
-{
-    NSInteger itemCount = [self.dataSource collectionView:self numberOfItemsInSection:0];
-    
-    if (index < itemCount) {
-        
-        if (CGSizeEqualToSize(CGSizeZero, self.contentSize)) {
-            [self layoutSubviews];
-        }
-        
-        NSIndexPath *indexPathAtMiddle = [self _indexPathAtMiddle];
-        
-        if (indexPathAtMiddle) {
-            
-            NSInteger originalIndexOfMiddle = indexPathAtMiddle.item % itemCount;
-            
-            NSRange range = NSMakeRange(0, itemCount);
+#pragma mark - Accessors
 
-            NSInteger delta = PMShortestCircularDistance(originalIndexOfMiddle, index, range);
-            
-            NSInteger toItem = indexPathAtMiddle.item + delta;
-            
-            NSIndexPath *toIndexPath = [NSIndexPath indexPathForItem:toItem inSection:0];
-            
-            [self scrollToItemAtIndexPath:toIndexPath
-                         atScrollPosition:UICollectionViewScrollPositionCenteredHorizontally | UICollectionViewScrollPositionCenteredVertically
-                                 animated:animated];
-        }
-    }
-}
 
 - (void) setDelegate:(id<PMCenteredCircularCollectionViewDelegate>)delegate
 {
@@ -80,13 +47,57 @@
 }
 
 
+#pragma mark - Public Methods
+
+
+- (void) centerCell:(UICollectionViewCell *)cell animated:(BOOL)animated;
+{
+    if ([self circularActive]) {
+        NSIndexPath *indexPath = [self indexPathForCell:cell];
+        [self centerCellAtIndex:indexPath.item animated:animated];
+    }
+}
+
+- (void) centerCellAtIndex:(NSUInteger)index animated:(BOOL)animated
+{
+    if ([self circularActive]) {
+        
+        NSInteger itemCount = [self.dataSource collectionView:self numberOfItemsInSection:0];
+        
+        if (index < itemCount) {
+            
+            if (CGSizeEqualToSize(CGSizeZero, self.contentSize)) {
+                [self layoutSubviews];
+            }
+            
+            NSIndexPath *indexPathAtMiddle = [self _indexPathAtMiddle];
+            
+            if (indexPathAtMiddle) {
+                
+                NSInteger originalIndexOfMiddle = indexPathAtMiddle.item % itemCount;
+                
+                NSRange range = NSMakeRange(0, itemCount);
+
+                NSInteger delta = PMShortestCircularDistance(originalIndexOfMiddle, index, range);
+                
+                NSInteger toItem = indexPathAtMiddle.item + delta;
+                
+                NSIndexPath *toIndexPath = [NSIndexPath indexPathForItem:toItem inSection:0];
+                
+                [self _centerIndexPath:toIndexPath animated:animated];
+            }
+        }
+    }
+}
+
+
 #pragma mark - UIScrollViewDelegate Methods
 
 
 - (void)scrollViewDidEndDecelerating:(UIScrollView *)scrollView
 {
     NSIndexPath *indexPath = [self _indexPathAtMiddle];
-    [self _centerIndexPath:indexPath];
+    [self _centerIndexPath:indexPath animated:YES];
 
     if (_delegateRespondsToScrollViewDidEndDecelerating) {
         [_originalDelegate scrollViewDidEndDecelerating:scrollView];
@@ -99,7 +110,7 @@
 
 - (void)collectionView:(UICollectionView *)collectionView didSelectItemAtIndexPath:(NSIndexPath *)indexPath
 {
-    [self _centerIndexPath:indexPath];
+    [self _centerIndexPath:indexPath animated:YES];
     
     if (_delegateRespondsToDidSelectItemAtIndexPath) {
         [_originalDelegate collectionView:collectionView didSelectItemAtIndexPath:indexPath];
@@ -120,17 +131,17 @@
     }
 }
 
-- (void) _centerIndexPath:(NSIndexPath *)indexPath
+- (void) _centerIndexPath:(NSIndexPath *)indexPath animated:(BOOL)animated
 {
-    [self scrollToItemAtIndexPath:indexPath
-                 atScrollPosition:UICollectionViewScrollPositionCenteredHorizontally | UICollectionViewScrollPositionCenteredVertically
-                         animated:YES];
-
-    if (_delegateRespondsToDidCenterItemAtIndex) {
-        [_originalDelegate collectionView:self didCenterItemAtIndex:indexPath.item];
+    if ([self circularActive]) {
+        [self scrollToItemAtIndexPath:indexPath
+                     atScrollPosition:UICollectionViewScrollPositionCenteredHorizontally | UICollectionViewScrollPositionCenteredVertically
+                             animated:animated];
+        
+        if (_delegateRespondsToDidCenterItemAtIndex) {
+            [_originalDelegate collectionView:self didCenterItemAtIndex:indexPath.item];
+        }
     }
-    
-
 }
 
 

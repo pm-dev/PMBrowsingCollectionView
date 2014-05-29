@@ -1,8 +1,8 @@
 PODS:
-  - PMBrowsingCollectionView (0.0.2):
+  - PMBrowsingCollectionView (0.0.3):
     - PMCircularCollectionView
     - PMUtils
-  - PMCircularCollectionView (0.0.21):
+  - PMCircularCollectionView (0.0.23):
     - PMUtils
   - PMUtils (0.0.40)
 
@@ -14,8 +14,8 @@ EXTERNAL SOURCES:
     :path: ../PMBrowsingCollectionView.podspec
 
 SPEC CHECKSUMS:
-  PMBrowsingCollectionView: ae1ecc0573a608819bf604a6cff8f0d9cff29e4d
-  PMCircularCollectionView: 04e6b92d6a4bb94da55f306827ba71cdf7fef017
+  PMBrowsingCollectionView: 9aa684c3872cd7f61db49cd714584658768eb1f4
+  PMCircularCollectionView: 60b88a45bd6b6a349b2852ef2d97f38f7490db0d
   PMUtils: d5c41dd4276e9ef4cb35461c57038c3215f467b1
 
 COCOAPODS: 0.32.1
