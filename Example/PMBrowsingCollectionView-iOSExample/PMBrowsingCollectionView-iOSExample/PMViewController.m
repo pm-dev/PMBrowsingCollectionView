@@ -108,10 +108,21 @@
     UICollectionReusableView *view = [collectionView dequeueReusableSupplementaryViewOfKind:kind
                                                                         withReuseIdentifier:[UICollectionReusableView defaultReuseIdentifier]
                                                                                forIndexPath:indexPath];
+    [view removeSubviews];
     view.backgroundColor = [UIColor cyanColor];
+    UIButton *button = [UIButton buttonWithType:UIButtonTypeCustom];
+    button.frame = view.bounds;
+    [button addTarget:self action:@selector(headerSelected:) forControlEvents:UIControlEventTouchUpInside];
+    [view addSubview:button];
+    button.tag = indexPath.section;
     return view;
 }
 
+- (void) headerSelected:(UIButton *)button
+{
+    DLog(@"Header selected at section %d", button.tag);
+    [self.collectionView expandSection:button.tag];
+}
 
 
 

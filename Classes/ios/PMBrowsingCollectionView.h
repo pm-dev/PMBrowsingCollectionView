@@ -27,8 +27,10 @@
 // Overwrite type for delegate;
 @property (nonatomic, assign) id <PMBrowsingCollectionViewDelegate> delegate;
 
-- (void) expandSection:(NSInteger)section;
-- (void) collapseSection:(NSInteger)section;
+- (void) expandSection:(NSUInteger)section;
+- (void) collapseSection:(NSUInteger)section;
+- (void) toggleExpandedForSection:(NSUInteger)seciton;
+- (BOOL) sectionExpanded:(NSUInteger)section;
 
 - (NSIndexPath *) normalizeIndexPath:(NSIndexPath *)indexPath;
 
