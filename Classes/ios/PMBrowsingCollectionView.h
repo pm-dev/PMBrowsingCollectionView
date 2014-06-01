@@ -32,7 +32,7 @@
 - (void) toggleExpandedForSection:(NSUInteger)seciton;
 - (BOOL) sectionExpanded:(NSUInteger)section;
 
-- (NSIndexPath *) normalizeIndexPath:(NSIndexPath *)indexPath;
+- (NSUInteger) normalizeItemIndex:(NSUInteger)index forSection:(NSUInteger)section;
 
 - (instancetype) initWithFrame:(CGRect)frame collectionViewLayout:(UICollectionViewFlowLayout *)layout;
 + (instancetype) collectionViewWithFrame:(CGRect)frame collectionViewLayout:(UICollectionViewFlowLayout *)layout;

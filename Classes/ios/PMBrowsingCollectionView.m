@@ -15,12 +15,39 @@ static inline NSString * PMReuseIdentifier(NSInteger index) {
     return [[NSNumber numberWithInteger:index] stringValue];
 }
 
+@class PMBrowsingCollectionViewSection;
+@interface PMCircularCollectionView (PMBrowsingCollectionView)
+
+- (PMBrowsingCollectionViewSection *)section;
+- (void) setSection:(PMBrowsingCollectionViewSection *)section;
+
+@end
+
+@implementation PMCircularCollectionView (PMBrowsingCollectionView)
+
+- (PMBrowsingCollectionViewSection *)section
+{
+    return objc_getAssociatedObject(self, @selector(section));
+}
+
+- (void) setSection:(PMBrowsingCollectionViewSection *)section
+{
+    objc_setAssociatedObject(self, @selector(section), section, OBJC_ASSOCIATION_ASSIGN);
+}
+
+@end
+
 @interface PMBrowsingCollectionViewSection : UICollectionViewCell
-@property (strong, nonatomic, readonly) PMCenteredCircularCollectionView *collectionView;
+
+@property (nonatomic) NSUInteger sectionIndex;
+@property (weak, nonatomic, readonly) PMCenteredCircularCollectionView *collectionView;
+
 @end
 
 @interface PMBrowsingCollectionViewSection ()
-@property (strong, nonatomic, readwrite) PMCenteredCircularCollectionView *collectionView;
+
+@property (weak, nonatomic, readwrite) PMCenteredCircularCollectionView *collectionView;
+
 @end
 
 @implementation PMBrowsingCollectionViewSection
@@ -48,42 +75,21 @@ static inline NSString * PMReuseIdentifier(NSInteger index) {
     collectionView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
     [self.contentView addSubview:collectionView];
     self.collectionView = collectionView;
+	self.collectionView.section = self;
 }
 
 @end
-
-@interface PMCircularCollectionView (PMBrowsingCollectionView)
-
-- (NSInteger) sectionIndex;
-- (void) setSectionIndex:(NSInteger)index;
-
-@end
-
-@implementation PMCircularCollectionView (PMBrowsingCollectionView)
-
-- (NSInteger) sectionIndex
-{
-    NSNumber *index = objc_getAssociatedObject(self, @selector(sectionIndex));
-    return [index integerValue];
-}
-
-- (void) setSectionIndex:(NSInteger)index
-{
-    objc_setAssociatedObject(self, @selector(sectionIndex), @(index), OBJC_ASSOCIATION_COPY);
-}
-
-@end
-
 
 @interface PMBrowsingCollectionView () <UICollectionViewDataSource, PMCenteredCircularCollectionViewDelegate>
 {
-    NSMutableArray *_sections;
+    NSMutableSet *_sections;
     NSMutableIndexSet *_expandedSectionIndices;
     NSMutableDictionary *_registeredClasses;
     NSMutableDictionary *_registeredNibs;
     PMProtocolInterceptor *_dataSourceInterceptor;
     PMProtocolInterceptor *_delegateInterceptor;
-    
+    NSUInteger _sectionsCount;
+	
     BOOL _delegateRespondsToSizeForItemAtIndexPath;
     BOOL _delegateImplementsShadowRadiusForSection;
     BOOL _delegateImplementsShadowColorForSection;
@@ -153,6 +159,7 @@ static inline NSString * PMReuseIdentifier(NSInteger index) {
     _expandedSectionIndices = [NSMutableIndexSet indexSet];
     _registeredClasses = [@{} mutableCopy];
     _registeredNibs = [@{} mutableCopy];
+	_sections = [NSMutableSet set];
 }
 
 - (void) setDataSource:(id<UICollectionViewDataSource>)dataSource
@@ -191,35 +198,51 @@ static inline NSString * PMReuseIdentifier(NSInteger index) {
 
 - (id) dequeueReusableCellWithReuseIdentifier:(NSString *)identifier forIndexPath:(NSIndexPath *)indexPath
 {
-    PMBrowsingCollectionViewSection *section = _sections[indexPath.section];
+    PMBrowsingCollectionViewSection *section = [self _cachedSectionAtIndex:indexPath.section];
     NSIndexPath *indexPathForSection = [NSIndexPath indexPathForItem:indexPath.item inSection:0];
     return [section.collectionView dequeueReusableCellWithReuseIdentifier:identifier forIndexPath:indexPathForSection];
 }
 
 
-- (void) expandSection:(NSUInteger)section
+- (void) expandSection:(NSUInteger)sectionIndex
 {
-    if ([self sectionExpanded:section] == NO) {
-        [_expandedSectionIndices addIndex:section];
-        [self reloadSections:[NSIndexSet indexSetWithIndex:section]];
+    if ([self sectionExpanded:sectionIndex] == NO) {
+		[_expandedSectionIndices addIndex:sectionIndex];
+		PMBrowsingCollectionViewSection *section = [self _cachedSectionAtIndex:sectionIndex];
+		if (section) {
+			[self _setExpandedLayoutForSection:section];
+			[self reloadSections:[NSIndexSet indexSetWithIndex:sectionIndex]];
+		}
+		else {
+			section = [self _dequeuedSectionAtIndex:sectionIndex];
+			[section.collectionView reloadData];
+			[self reloadSections:[NSIndexSet indexSetWithIndex:sectionIndex]];
+		}
     }
 }
 
-- (void) collapseSection:(NSUInteger)section
+- (void) collapseSection:(NSUInteger)sectionIndex
+{
+    if ([self sectionExpanded:sectionIndex]) {
+		[_expandedSectionIndices removeIndex:sectionIndex];
+		PMBrowsingCollectionViewSection *section = [self _cachedSectionAtIndex:sectionIndex];
+		if (section) {
+			[self _setCollapsedLayoutForSection:section];
+			[self reloadSections:[NSIndexSet indexSetWithIndex:sectionIndex]];
+		}
+		else {
+			[self _dequeuedSectionAtIndex:sectionIndex];
+		}
+    }
+}
+
+- (void) toggleExpandedForSection:(NSUInteger)section
 {
     if ([self sectionExpanded:section]) {
-        [_expandedSectionIndices removeIndex:section];
-        [self reloadSections:[NSIndexSet indexSetWithIndex:section]];
-    }
-}
-
-- (void) toggleExpandedForSection:(NSUInteger)seciton
-{
-    if ([self sectionExpanded:seciton]) {
-        [self collapseSection:seciton];
+        [self collapseSection:section];
     }
     else {
-        [self expandSection:seciton];
+        [self expandSection:section];
     }
 }
 
@@ -228,13 +251,12 @@ static inline NSString * PMReuseIdentifier(NSInteger index) {
     return [_expandedSectionIndices containsIndex:section];
 }
 
-- (NSIndexPath *) normalizeIndexPath:(NSIndexPath *)indexPath
+- (NSUInteger) normalizeItemIndex:(NSUInteger)itemIndex forSection:(NSUInteger)sectionIndex
 {
-    if (indexPath.section < _sections.count) {
-        PMBrowsingCollectionViewSection *section = _sections[indexPath.section];
-        NSInteger itemIndex = [section.collectionView normalizeIndexFromIndexPath:indexPath];
-        NSIndexPath *normalizedIndexPath = [NSIndexPath indexPathForItem:itemIndex inSection:indexPath.section];
-        return normalizedIndexPath;
+    if (sectionIndex < _sectionsCount) {
+        PMBrowsingCollectionViewSection *cell = [self _cachedSectionAtIndex:sectionIndex];
+        NSInteger normalizedItemIndex = [cell.collectionView normalizeIndex:itemIndex];
+        return normalizedItemIndex;
     }
     @throw([NSException exceptionWithName:NSInvalidArgumentException reason:@"Index's section out of bounds." userInfo:nil]);
 }
@@ -244,25 +266,24 @@ static inline NSString * PMReuseIdentifier(NSInteger index) {
 
 - (NSInteger) numberOfSectionsInCollectionView:(UICollectionView *)collectionView
 {
-    NSInteger sectionsCount = _dataSourceImplementsNumberOfSectionsInCollectionView? [_dataSourceInterceptor.receiver numberOfSectionsInCollectionView:self] : 1;
-
-    _sections = [NSMutableArray arrayWithCapacity:sectionsCount];
+    _sectionsCount = _dataSourceImplementsNumberOfSectionsInCollectionView? [_dataSourceInterceptor.receiver numberOfSectionsInCollectionView:self] : 1;
     
-    for (NSInteger i = 0; i < sectionsCount; i++) {
-        [super registerClass:[PMBrowsingCollectionViewSection class] forCellWithReuseIdentifier:PMReuseIdentifier(i)];
+    for (NSUInteger i = 0; i < _sectionsCount; i++) {
+		NSString *reuseIdentifier = PMReuseIdentifier(i);
+        [super registerClass:[PMBrowsingCollectionViewSection class] forCellWithReuseIdentifier:reuseIdentifier];
     }
     
-    return sectionsCount;
+    return _sectionsCount;
 }
 
 - (NSInteger) collectionView:(UICollectionView *)collectionView numberOfItemsInSection:(NSInteger)section
 {
     if (self == collectionView) {
-        return 1;
+		return 1;
     }
     else {
         PMCenteredCircularCollectionView *circularCollectionView = (PMCenteredCircularCollectionView *)collectionView;
-        return [_dataSourceInterceptor.receiver collectionView:self numberOfItemsInSection:[circularCollectionView sectionIndex]];
+        return [_dataSourceInterceptor.receiver collectionView:self numberOfItemsInSection:circularCollectionView.section.sectionIndex];
     }
 }
 
@@ -270,29 +291,11 @@ static inline NSString * PMReuseIdentifier(NSInteger index) {
 - (UICollectionViewCell *) collectionView:(UICollectionView *)collectionView cellForItemAtIndexPath:(NSIndexPath *)indexPath
 {
     if (self == collectionView) {
-        
-        BOOL expand = [_expandedSectionIndices containsIndex:indexPath.section];
-        UICollectionViewFlowLayout *layout = [UICollectionViewFlowLayout new];
-        layout.scrollDirection
-        
-        
-        
-        PMBrowsingCollectionViewSection *section = nil;
-        if (_sections.count > indexPath.section) {
-            
-            section = _sections[indexPath.section];
-            [section.collectionView reloadData];
-        }
-        else {
-        NSString *reuseIdentifier = PMReuseIdentifier(indexPath.section);
-            section = [super dequeueReusableCellWithReuseIdentifier:reuseIdentifier forIndexPath:indexPath];
-            [self _configureSection:section atIndex:indexPath.section];
-        }
-        return section;
+		return [self _dequeuedSectionAtIndex:indexPath.section];
     }
     else {
         PMCenteredCircularCollectionView *circularCollectionView = (PMCenteredCircularCollectionView *)collectionView;
-        NSIndexPath *indexPathForSection = [NSIndexPath indexPathForItem:indexPath.item inSection:[circularCollectionView sectionIndex]];
+        NSIndexPath *indexPathForSection = [NSIndexPath indexPathForItem:indexPath.item inSection:circularCollectionView.section.sectionIndex];
         return [_dataSourceInterceptor.receiver collectionView:self cellForItemAtIndexPath:indexPathForSection];
     }
 }
@@ -301,7 +304,9 @@ static inline NSString * PMReuseIdentifier(NSInteger index) {
 #pragma mark - PMCenteredCircularCollectionViewDelegate Methods
 
 
-- (CGFloat) collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout *)collectionViewLayout minimumLineSpacingForSectionAtIndex:(NSInteger)section
+- (CGFloat) collectionView:(UICollectionView *)collectionView
+					layout:(UICollectionViewLayout *)collectionViewLayout
+minimumLineSpacingForSectionAtIndex:(NSInteger)section
 {
     if (_delegateImplementsMinimumLineSpacingForSectionAtIndex) {
         return [self.delegate collectionView:self layout:self.collectionViewLayout minimumLineSpacingForSectionAtIndex:section];
@@ -325,35 +330,26 @@ minimumInteritemSpacingForSectionAtIndex:(NSInteger)section
 {
     if (self == collectionView) {
         
-        CGSize maxItemDimensions = CGSizeZero;
-        if (_delegateRespondsToSizeForItemAtIndexPath) {
-            NSInteger itemsInSection = [_dataSourceInterceptor.receiver collectionView:self numberOfItemsInSection:indexPath.section];
-            for (NSUInteger i = 0; i < itemsInSection; i++) {
-                NSIndexPath *sectionIndexPath = [NSIndexPath indexPathForItem:i inSection:indexPath.section];
-                CGSize itemSize = [_delegateInterceptor.receiver collectionView:collectionView layout:collectionViewLayout sizeForItemAtIndexPath:sectionIndexPath];
-                if (itemSize.width > maxItemDimensions.width) {
-                    maxItemDimensions.width = itemSize.width;
-                }
-                if (itemSize.height > maxItemDimensions.height) {
-                    maxItemDimensions.height = itemSize.height;
-                }
-            }
-        }
-        else {
-            maxItemDimensions = self.collectionViewLayout.itemSize;
-        }
-        
-        switch (self.collectionViewLayout.scrollDirection) {
-            case UICollectionViewScrollDirectionHorizontal: return CGSizeMake(maxItemDimensions.width, collectionView.bounds.size.height);
-            case UICollectionViewScrollDirectionVertical: return CGSizeMake(self.bounds.size.width, maxItemDimensions.height);
-        }
+		if ([self sectionExpanded:indexPath.section]) {
+			PMBrowsingCollectionViewSection *section = [self _cachedSectionAtIndex:indexPath.section];
+			return section.collectionView.contentSize;
+		}
+		else {
+			CGSize maxItemDimensions = [self _calculateMaxItemDimensionsForSection:indexPath.section];
+			switch (self.collectionViewLayout.scrollDirection) {
+				case UICollectionViewScrollDirectionHorizontal: return CGSizeMake(maxItemDimensions.width, collectionView.bounds.size.height);
+				case UICollectionViewScrollDirectionVertical: return CGSizeMake(self.bounds.size.width, maxItemDimensions.height);
+			}
+		}
     }
     else if (_delegateRespondsToSizeForItemAtIndexPath) {
+		
         PMCenteredCircularCollectionView *circularCollectionView = (PMCenteredCircularCollectionView *)collectionView;
-        NSIndexPath *indexPathForSection = [NSIndexPath indexPathForItem:indexPath.item inSection:[circularCollectionView sectionIndex]];
+        NSIndexPath *indexPathForSection = [NSIndexPath indexPathForItem:indexPath.item inSection:circularCollectionView.section.sectionIndex];
         return [_delegateInterceptor.receiver collectionView:collectionView layout:collectionViewLayout sizeForItemAtIndexPath:indexPathForSection];
     }
     else {
+		
         PMCenteredCircularCollectionView *circularCollectionView = (PMCenteredCircularCollectionView *)collectionView;
         return circularCollectionView.collectionViewLayout.itemSize;
     }
@@ -384,7 +380,7 @@ minimumInteritemSpacingForSectionAtIndex:(NSInteger)section
 - (void) collectionView:(PMCenteredCircularCollectionView *)collectionView didCenterItemAtIndex:(NSUInteger)index
 {
     if (_delegateImplementsDidCenterItemAtIndexPath) {
-        NSIndexPath *indexPath = [NSIndexPath indexPathForItem:index inSection:[collectionView sectionIndex]];
+        NSIndexPath *indexPath = [NSIndexPath indexPathForItem:index inSection:collectionView.section.sectionIndex];
         [_delegateInterceptor.receiver collectionView:self didCenterItemAtIndexPath:indexPath];
     }
 }
@@ -394,14 +390,19 @@ minimumInteritemSpacingForSectionAtIndex:(NSInteger)section
 
 - (void) _configureSection:(PMBrowsingCollectionViewSection *)section atIndex:(NSInteger)sectionIndex
 {
-    _sections[sectionIndex] = section;
-    
-    [self _setLayoutOnCollectionView:section.collectionView inSection:sectionIndex];
-    
+	section.sectionIndex = sectionIndex;
+	
     section.collectionView.delegate = self;
     section.collectionView.dataSource = self;
     section.collectionView.backgroundColor = self.backgroundColor;
-    section.collectionView.sectionIndex = sectionIndex;
+	if ([self sectionExpanded:sectionIndex]) {
+		DLog(@"Configuring expanded section %@ at index %d", section, sectionIndex);
+		[self _setExpandedLayoutForSection:section];
+	}
+	else {
+		DLog(@"Configuring collapsed section %@ at index %d", section, sectionIndex);
+		[self _setCollapsedLayoutForSection:section];
+	}
     
     if (_delegateImplementsShadowColorForSection) {
         section.collectionView.shadowColor = [_delegateInterceptor.receiver collectionView:self shadowColorForSection:sectionIndex];
@@ -417,28 +418,71 @@ minimumInteritemSpacingForSectionAtIndex:(NSInteger)section
     [_registeredNibs enumerateKeysAndObjectsUsingBlock:^(NSString *identifier, UINib *nib, BOOL *stop) {
         [section.collectionView registerNib:nib forCellWithReuseIdentifier:identifier];
     }];
-    
-    [section.collectionView reloadData];
 }
 
-- (void) _setLayoutOnCollectionView:(PMCenteredCircularCollectionView *)collectionView inSection:(NSInteger)section
+- (void) _setExpandedLayoutForSection:(PMBrowsingCollectionViewSection *)section
 {
-    if ([_expandedSectionIndices containsIndex:section]) {
-        UICollectionViewFlowLayout *layout = [UICollectionViewFlowLayout new];
-        layout.minimumLineSpacing = self.collectionViewLayout.minimumLineSpacing;
-        layout.minimumInteritemSpacing = self.collectionViewLayout.minimumInteritemSpacing;
-        collectionView.collectionViewLayout = layout;
-    }
-    else {
-        PMCenteredCollectionViewFlowLayout *layout = [PMCenteredCollectionViewFlowLayout new];
-        layout.minimumLineSpacing = self.collectionViewLayout.minimumLineSpacing;
-        layout.minimumInteritemSpacing = self.collectionViewLayout.minimumInteritemSpacing;
-        layout.scrollDirection = ((self.collectionViewLayout.scrollDirection & UICollectionViewScrollDirectionHorizontal)?
-                                  UICollectionViewScrollDirectionVertical : UICollectionViewScrollDirectionHorizontal);
-        collectionView.collectionViewLayout = layout;
-    }
-    
-    
+	section.collectionView.circularDisabled = YES;
+	
+	UICollectionViewFlowLayout *layout = [UICollectionViewFlowLayout new];
+	layout.scrollDirection = self.collectionViewLayout.scrollDirection;
+	layout.minimumLineSpacing = self.collectionViewLayout.minimumLineSpacing;
+	layout.minimumInteritemSpacing = self.collectionViewLayout.minimumInteritemSpacing;
+	section.collectionView.collectionViewLayout = layout;
+}
+
+- (void) _setCollapsedLayoutForSection:(PMBrowsingCollectionViewSection *)section
+{
+	section.collectionView.circularDisabled = NO;
+	
+	PMCenteredCollectionViewFlowLayout *layout = [PMCenteredCollectionViewFlowLayout new];
+	layout.scrollDirection = (self.collectionViewLayout.scrollDirection & UICollectionViewScrollDirectionHorizontal)?
+	UICollectionViewScrollDirectionVertical : UICollectionViewScrollDirectionHorizontal;
+	layout.minimumLineSpacing = self.collectionViewLayout.minimumLineSpacing;
+	layout.minimumInteritemSpacing = self.collectionViewLayout.minimumInteritemSpacing;
+	section.collectionView.collectionViewLayout = layout;
+}
+
+- (CGSize) _calculateMaxItemDimensionsForSection:(NSInteger)section
+{
+	CGSize maxItemDimensions = CGSizeZero;
+	if (_delegateRespondsToSizeForItemAtIndexPath) {
+		NSInteger itemsInSection = [_dataSourceInterceptor.receiver collectionView:self numberOfItemsInSection:section];
+		for (NSUInteger i = 0; i < itemsInSection; i++) {
+			NSIndexPath *sectionIndexPath = [NSIndexPath indexPathForItem:i inSection:section];
+			CGSize itemSize = [_delegateInterceptor.receiver collectionView:self layout:self.collectionViewLayout sizeForItemAtIndexPath:sectionIndexPath];
+			if (itemSize.width > maxItemDimensions.width) {
+				maxItemDimensions.width = itemSize.width;
+			}
+			if (itemSize.height > maxItemDimensions.height) {
+				maxItemDimensions.height = itemSize.height;
+			}
+		}
+	}
+	else {
+		maxItemDimensions = self.collectionViewLayout.itemSize;
+	}
+	return maxItemDimensions;
+}
+
+- (PMBrowsingCollectionViewSection *) _cachedSectionAtIndex:(NSUInteger)sectionIndex
+{
+	for (PMBrowsingCollectionViewSection *cachedSection in _sections) {
+		if (cachedSection.sectionIndex == sectionIndex) {
+			return cachedSection;
+		}
+	}
+	return nil;
+}
+
+- (PMBrowsingCollectionViewSection *) _dequeuedSectionAtIndex:(NSUInteger)sectionIndex
+{
+	NSString *reuseIdentifier = PMReuseIdentifier(sectionIndex);
+	NSIndexPath *adjustedIndexPath = [NSIndexPath indexPathForItem:0 inSection:sectionIndex];
+	PMBrowsingCollectionViewSection *section = [super dequeueReusableCellWithReuseIdentifier:reuseIdentifier forIndexPath:adjustedIndexPath];
+	[_sections addObject:section];
+	[self _configureSection:section atIndex:sectionIndex];
+	return section;
 }
 
 @end

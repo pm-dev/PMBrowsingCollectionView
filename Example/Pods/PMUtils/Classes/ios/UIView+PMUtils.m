@@ -28,8 +28,8 @@
     NSString *name = [self defaultNibName];
     UINib *nib = [nibCache objectForKey:name];
     
-    if (!nib) {
-        nib = [UINib nibWithNibName:[self defaultNibName] bundle:nil];
+    if (!nib && [[NSBundle mainBundle] pathForResource:name ofType:@"nib"]) {
+        nib = [UINib nibWithNibName:name bundle:nil];
         [nibCache setObject:nib?: [NSNull null]  forKey:name];
     }
     else if ([nib isEqual:[NSNull null]]) {

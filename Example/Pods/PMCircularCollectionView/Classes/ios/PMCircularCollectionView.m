@@ -131,8 +131,11 @@ static NSUInteger const ContentMultiplier = 4;
 
 - (void) setCircularDisabled:(BOOL)circularDisabled
 {
-    _explicitlyDisabled = circularDisabled;
-    _shadowLayer.hidden = ![self circularActive];
+	if (_explicitlyDisabled != circularDisabled) {
+		_explicitlyDisabled = circularDisabled;
+		_shadowLayer.hidden = ![self circularActive];
+		[self reloadData];
+	}
 }
 
 - (void) setCircularImplicitlyDisabled:(BOOL)circularImplicitlyDisabled
@@ -150,9 +153,9 @@ static NSUInteger const ContentMultiplier = 4;
     return !_explicitlyDisabled && !_circularImplicitlyDisabled;
 }
 
-- (NSUInteger) normalizeIndexFromIndexPath:(NSIndexPath *)indexPath
+- (NSUInteger) normalizeIndex:(NSUInteger)index
 {
-    return indexPath.item % _itemCount;
+    return _itemCount? index % _itemCount : 0;
 }
 
 #pragma mark - UICollectionViewDatasource Methods

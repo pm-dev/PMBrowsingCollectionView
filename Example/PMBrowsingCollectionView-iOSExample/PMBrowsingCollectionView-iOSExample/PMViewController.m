@@ -23,8 +23,8 @@
     
     UICollectionViewFlowLayout *layout = [UICollectionViewFlowLayout new];
     layout.scrollDirection = UICollectionViewScrollDirectionVertical;
-    layout.minimumInteritemSpacing = 10.0f;
-    layout.minimumLineSpacing = 10.0f;
+    layout.minimumInteritemSpacing = 2.0f;
+    layout.minimumLineSpacing = 2.0f;
     
     self.collectionView = [PMBrowsingCollectionView collectionViewWithFrame:self.view.bounds
                                                        collectionViewLayout:layout];
@@ -68,7 +68,7 @@
 
 - (CGSize) collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout *)collectionViewLayout sizeForItemAtIndexPath:(NSIndexPath *)indexPath
 {
-    return CGSizeMake(110, 100);
+    return CGSizeMake(159, 100);
 }
 
 
@@ -103,7 +103,7 @@
     return 3;
 }
 
-- (UICollectionReusableView *) collectionView:(UICollectionView *)collectionView viewForSupplementaryElementOfKind:(NSString *)kind atIndexPath:(NSIndexPath *)indexPath
+- (UICollectionReusableView *) collectionView:(PMBrowsingCollectionView *)collectionView viewForSupplementaryElementOfKind:(NSString *)kind atIndexPath:(NSIndexPath *)indexPath
 {
     UICollectionReusableView *view = [collectionView dequeueReusableSupplementaryViewOfKind:kind
                                                                         withReuseIdentifier:[UICollectionReusableView defaultReuseIdentifier]
@@ -120,8 +120,9 @@
 
 - (void) headerSelected:(UIButton *)button
 {
-    DLog(@"Header selected at section %d", button.tag);
-    [self.collectionView expandSection:button.tag];
+//    DLog(@"Header selected at section %d", button.tag);
+	
+    [self.collectionView toggleExpandedForSection:button.tag];
 }
 
 
