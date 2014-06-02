@@ -90,6 +90,12 @@ static NSUInteger const ContentMultiplier = 4;
     [self _recenterIfNecessary];
 }
 
+- (void) setFrame:(CGRect)frame
+{
+	[super setFrame:frame];
+	[self _resetShadowLayer];
+}
+
 
 #pragma mark - Accessors
 
@@ -252,7 +258,8 @@ static NSUInteger const ContentMultiplier = 4;
         _shadowLayer.frame = self.bounds;
         _shadowLayer.colors = @[(id)outerColor.CGColor, (id)innerColor.CGColor, (id)innerColor.CGColor, (id)outerColor.CGColor];
         _shadowLayer.anchorPoint = CGPointZero;
-        
+        _shadowLayer.position = self.contentOffset;
+		
         CGFloat totalDistance;
         switch (self.collectionViewLayout.scrollDirection) {
                 
