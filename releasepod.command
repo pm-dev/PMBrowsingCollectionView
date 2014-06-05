@@ -8,4 +8,11 @@
 
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 cd $DIR
-rake release
+
+VERSION=$(rake localversion)
+REPO_NAME=${PWD##*/}
+git add -A
+git commit -m "Release $VERSION"
+git tag -a $VERSION -m "Release $VERSION"
+git push origin master --tags
+pod repo push PMSpecs $REPO_NAME.podspec 

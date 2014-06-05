@@ -1,3 +1,8 @@
+desc "Prints the version as reported by the Podspec."
+task :localversion do
+  puts spec_version
+end
+
 desc "Runs the specs [EMPTY]"
 task :spec do
   # Provide your own implementation

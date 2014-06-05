@@ -34,6 +34,20 @@
 }
 
 
+#pragma mark - Overwritten Methods
+
+
+- (void) willMoveToSuperview:(UIView *)newSuperview
+{
+	if (newSuperview) {
+		if (CGSizeEqualToSize(CGSizeZero, self.contentSize)) {
+			[self layoutSubviews];
+		}
+		NSIndexPath *indexPath = [self _indexPathAtMiddle];
+		[self _centerIndexPath:indexPath animated:NO];
+	}
+}
+
 #pragma mark - Accessors
 
 
@@ -65,10 +79,6 @@
         NSInteger itemCount = [self.dataSource collectionView:self numberOfItemsInSection:0];
         
         if (index < itemCount) {
-            
-            if (CGSizeEqualToSize(CGSizeZero, self.contentSize)) {
-                [self layoutSubviews];
-            }
             
             NSIndexPath *indexPathAtMiddle = [self _indexPathAtMiddle];
             

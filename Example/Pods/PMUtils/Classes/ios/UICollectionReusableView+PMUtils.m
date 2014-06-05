@@ -11,11 +11,10 @@
 
 @implementation UICollectionReusableView (PMUtils)
 
-
 + (instancetype)sizingCell
 {
-	static NSCache *cellCache = nil;
-	static dispatch_once_t cacheToken;
+    static NSCache *cellCache = nil;
+    static dispatch_once_t cacheToken;
     dispatch_once(&cacheToken, ^{
         cellCache = [NSCache new];
     });
