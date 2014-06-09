@@ -8,6 +8,7 @@
 
 #import "PMViewController.h"
 #import "PMBrowsingCollectionView.h"
+#import "PMStickyHeaderFlowLayout.h"
 #import "PMUtils.h"
 
 @interface PMViewController () <PMBrowsingCollectionViewDelegate, UICollectionViewDataSource>
@@ -21,11 +22,12 @@
 {
     [super viewDidLoad];
     
-    UICollectionViewFlowLayout *layout = [UICollectionViewFlowLayout new];
+    PMStickyHeaderFlowLayout *layout = [PMStickyHeaderFlowLayout new];
     layout.scrollDirection = UICollectionViewScrollDirectionVertical;
     layout.minimumInteritemSpacing = 2.0f;
     layout.minimumLineSpacing = 2.0f;
-    
+    layout.stickyHeaderEndabled = YES;
+	
     _collectionView = [PMBrowsingCollectionView collectionViewWithFrame:self.view.bounds
                                                        collectionViewLayout:layout];
 	_collectionView.autoresizingMask = UIViewAutoresizingFlexibleHeight | UIViewAutoresizingFlexibleWidth;
@@ -85,8 +87,8 @@
     [cell.contentView addSubview:label];
     
     switch (indexPath.section) {
-        case 0: cell.contentView.backgroundColor = [UIColor orangeColor]; break;
-        case 1: cell.contentView.backgroundColor = [UIColor grayColor]; break;
+        case 0: cell.contentView.backgroundColor = [UIColor redColor]; break;
+        case 1: cell.contentView.backgroundColor = [UIColor blueColor]; break;
         case 2: cell.contentView.backgroundColor = [UIColor greenColor]; break;
         default:
             break;
@@ -110,7 +112,8 @@
                                                                         withReuseIdentifier:[UICollectionReusableView defaultReuseIdentifier]
                                                                                forIndexPath:indexPath];
     [view removeSubviews];
-    view.backgroundColor = [UIColor cyanColor];
+	view.backgroundColor = [UIColor cyanColor];
+	view.layer.borderWidth = 3.0f;
     UIButton *button = [UIButton buttonWithType:UIButtonTypeCustom];
     button.frame = view.bounds;
     [button addTarget:self action:@selector(_headerSelected:) forControlEvents:UIControlEventTouchUpInside];

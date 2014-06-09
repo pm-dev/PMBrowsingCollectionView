@@ -1,5 +1,9 @@
 PODS:
-  - PMBrowsingCollectionView (0.0.3):
+  - PMBrowsingCollectionView (0.0.4):
+    - PMBrowsingCollectionView/PMStickyHeaderFlowLayout
+    - PMCircularCollectionView
+    - PMUtils
+  - PMBrowsingCollectionView/PMStickyHeaderFlowLayout (0.0.4):
     - PMCircularCollectionView
     - PMUtils
   - PMCircularCollectionView (0.0.26):
@@ -14,7 +18,7 @@ EXTERNAL SOURCES:
     :path: ../PMBrowsingCollectionView.podspec
 
 SPEC CHECKSUMS:
-  PMBrowsingCollectionView: 9aa684c3872cd7f61db49cd714584658768eb1f4
+  PMBrowsingCollectionView: 8702aadb7c36f75118bc4ca900fe768f5d33b603
   PMCircularCollectionView: d4484a6deb58ff7c9d8bb38e2c791977dcb832c4
   PMUtils: d63d08d739c2c59dacfe77a81bb36c42b9430415
 

@@ -30,8 +30,7 @@ static NSString * const PMBrowsingCollectionViewCellReuseIdentifier = @"PMBrowsi
     PMProtocolInterceptor *_dataSourceInterceptor;
     PMProtocolInterceptor *_delegateInterceptor;
     NSUInteger _sectionsCount;
-	
-	
+		
     BOOL _delegateRespondsToSizeForItemAtIndexPath;
     BOOL _delegateImplementsShadowRadiusForSection;
     BOOL _delegateImplementsShadowColorForSection;
@@ -102,10 +101,6 @@ static NSString * const PMBrowsingCollectionViewCellReuseIdentifier = @"PMBrowsi
 	
 	[super registerClass:[UICollectionViewCell class] forCellWithReuseIdentifier:PMBrowsingCollectionViewCellReuseIdentifier];
 }
-
-
-#pragma mark - Overwritten Methods
-
 
 - (void) registerClass:(Class)cellClass forCellWithReuseIdentifier:(NSString *)identifier
 {
