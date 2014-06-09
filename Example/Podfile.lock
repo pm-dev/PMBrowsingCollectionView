@@ -2,7 +2,7 @@ PODS:
   - PMBrowsingCollectionView (0.0.3):
     - PMCircularCollectionView
     - PMUtils
-  - PMCircularCollectionView (0.0.24):
+  - PMCircularCollectionView (0.0.26):
     - PMUtils
   - PMUtils (0.0.46)
 
@@ -15,7 +15,7 @@ EXTERNAL SOURCES:
 
 SPEC CHECKSUMS:
   PMBrowsingCollectionView: 9aa684c3872cd7f61db49cd714584658768eb1f4
-  PMCircularCollectionView: 21632976ae5b9361434f8d2083a652705ffceae0
+  PMCircularCollectionView: d4484a6deb58ff7c9d8bb38e2c791977dcb832c4
   PMUtils: d63d08d739c2c59dacfe77a81bb36c42b9430415
 
 COCOAPODS: 0.33.1

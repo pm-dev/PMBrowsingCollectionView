@@ -12,6 +12,7 @@
 
 @property (nonatomic) CGFloat shadowRadius;
 @property (nonatomic, strong) UIColor *shadowColor;
+@property (nonatomic, readonly) NSUInteger itemCount;
 @property (nonatomic) BOOL circularDisabled;
 - (BOOL) circularActive;
 

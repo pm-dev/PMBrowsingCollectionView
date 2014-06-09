@@ -11,35 +11,36 @@
 #import "PMUtils.h"
 
 @interface PMViewController () <PMBrowsingCollectionViewDelegate, UICollectionViewDataSource>
-@property (nonatomic, strong) PMBrowsingCollectionView *collectionView;
 @end
 
-@implementation PMViewController
+@implementation PMViewController {
+	PMBrowsingCollectionView *_collectionView;
+}
 
 - (void)viewDidLoad
 {
     [super viewDidLoad];
-	// Do any additional setup after loading the view, typically from a nib.
     
     UICollectionViewFlowLayout *layout = [UICollectionViewFlowLayout new];
     layout.scrollDirection = UICollectionViewScrollDirectionVertical;
     layout.minimumInteritemSpacing = 2.0f;
     layout.minimumLineSpacing = 2.0f;
     
-    self.collectionView = [PMBrowsingCollectionView collectionViewWithFrame:self.view.bounds
+    _collectionView = [PMBrowsingCollectionView collectionViewWithFrame:self.view.bounds
                                                        collectionViewLayout:layout];
-    self.collectionView.delegate = self;
-    self.collectionView.dataSource = self;
-    [self.collectionView registerClass:[UICollectionViewCell class]
+	_collectionView.autoresizingMask = UIViewAutoresizingFlexibleHeight | UIViewAutoresizingFlexibleWidth;
+    _collectionView.delegate = self;
+    _collectionView.dataSource = self;
+    [_collectionView registerClass:[UICollectionViewCell class]
             forCellWithReuseIdentifier:[UICollectionViewCell defaultReuseIdentifier]];
-    [self.collectionView registerClass:[UICollectionReusableView class]
+    [_collectionView registerClass:[UICollectionReusableView class]
             forSupplementaryViewOfKind:UICollectionElementKindSectionHeader
                    withReuseIdentifier:[UICollectionReusableView defaultReuseIdentifier]];
-    [self.view addSubview:self.collectionView];
+    [self.view addSubview:_collectionView];
 }
 
 
-#pragma mark - Delegate
+#pragma mark - PMBrowsingCollectionViewDelegate Methods
 
 - (CGFloat) collectionView:(PMBrowsingCollectionView *)collectionView shadowRadiusForSection:(NSInteger)section
 {
@@ -72,7 +73,8 @@
 }
 
 
-#pragma mark - Datasource
+#pragma mark - UICollectionViewDataSource Methods
+
 
 - (UICollectionViewCell *)collectionView:(UICollectionView *)collectionView cellForItemAtIndexPath:(NSIndexPath *)indexPath
 {
@@ -89,7 +91,6 @@
         default:
             break;
     }
-    
     return cell;
 }
 
@@ -112,25 +113,19 @@
     view.backgroundColor = [UIColor cyanColor];
     UIButton *button = [UIButton buttonWithType:UIButtonTypeCustom];
     button.frame = view.bounds;
-    [button addTarget:self action:@selector(headerSelected:) forControlEvents:UIControlEventTouchUpInside];
+    [button addTarget:self action:@selector(_headerSelected:) forControlEvents:UIControlEventTouchUpInside];
     [view addSubview:button];
     button.tag = indexPath.section;
     return view;
 }
 
-- (void) headerSelected:(UIButton *)button
+
+#pragma mark - Private Methods
+
+
+- (void) _headerSelected:(UIButton *)button
 {
-//    DLog(@"Header selected at section %d", button.tag);
-	
-    [self.collectionView toggleExpandedForSection:button.tag];
-}
-
-
-
-- (void)didReceiveMemoryWarning
-{
-    [super didReceiveMemoryWarning];
-    // Dispose of any resources that can be recreated.
+    [_collectionView toggleExpandedForSection:button.tag];
 }
 
 @end
