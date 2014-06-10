@@ -10,13 +10,13 @@
 #define COCOAPODS_POD_AVAILABLE_PMBrowsingCollectionView
 #define COCOAPODS_VERSION_MAJOR_PMBrowsingCollectionView 0
 #define COCOAPODS_VERSION_MINOR_PMBrowsingCollectionView 0
-#define COCOAPODS_VERSION_PATCH_PMBrowsingCollectionView 4
+#define COCOAPODS_VERSION_PATCH_PMBrowsingCollectionView 5
 
 // PMBrowsingCollectionView/PMStickyHeaderFlowLayout
 #define COCOAPODS_POD_AVAILABLE_PMBrowsingCollectionView_PMStickyHeaderFlowLayout
 #define COCOAPODS_VERSION_MAJOR_PMBrowsingCollectionView_PMStickyHeaderFlowLayout 0
 #define COCOAPODS_VERSION_MINOR_PMBrowsingCollectionView_PMStickyHeaderFlowLayout 0
-#define COCOAPODS_VERSION_PATCH_PMBrowsingCollectionView_PMStickyHeaderFlowLayout 4
+#define COCOAPODS_VERSION_PATCH_PMBrowsingCollectionView_PMStickyHeaderFlowLayout 5
 
 // PMCircularCollectionView
 #define COCOAPODS_POD_AVAILABLE_PMCircularCollectionView
@@ -28,5 +28,29 @@
 #define COCOAPODS_POD_AVAILABLE_PMUtils
 #define COCOAPODS_VERSION_MAJOR_PMUtils 0
 #define COCOAPODS_VERSION_MINOR_PMUtils 0
-#define COCOAPODS_VERSION_PATCH_PMUtils 46
+#define COCOAPODS_VERSION_PATCH_PMUtils 47
+
+// PMUtils/PMAnimationQueue
+#define COCOAPODS_POD_AVAILABLE_PMUtils_PMAnimationQueue
+#define COCOAPODS_VERSION_MAJOR_PMUtils_PMAnimationQueue 0
+#define COCOAPODS_VERSION_MINOR_PMUtils_PMAnimationQueue 0
+#define COCOAPODS_VERSION_PATCH_PMUtils_PMAnimationQueue 47
+
+// PMUtils/PMOrderedDictionary
+#define COCOAPODS_POD_AVAILABLE_PMUtils_PMOrderedDictionary
+#define COCOAPODS_VERSION_MAJOR_PMUtils_PMOrderedDictionary 0
+#define COCOAPODS_VERSION_MINOR_PMUtils_PMOrderedDictionary 0
+#define COCOAPODS_VERSION_PATCH_PMUtils_PMOrderedDictionary 47
+
+// PMUtils/PMPair
+#define COCOAPODS_POD_AVAILABLE_PMUtils_PMPair
+#define COCOAPODS_VERSION_MAJOR_PMUtils_PMPair 0
+#define COCOAPODS_VERSION_MINOR_PMUtils_PMPair 0
+#define COCOAPODS_VERSION_PATCH_PMUtils_PMPair 47
+
+// PMUtils/PMProtocolInterceptor
+#define COCOAPODS_POD_AVAILABLE_PMUtils_PMProtocolInterceptor
+#define COCOAPODS_VERSION_MAJOR_PMUtils_PMProtocolInterceptor 0
+#define COCOAPODS_VERSION_MINOR_PMUtils_PMProtocolInterceptor 0
+#define COCOAPODS_VERSION_PATCH_PMUtils_PMProtocolInterceptor 47
 

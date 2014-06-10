@@ -57,9 +57,7 @@ static inline CGFloat PMSquaredDistanceFromRectToPoint(CGRect rect, CGPoint poin
     NSIndexPath *nearestIndexPath = nil;
     CGFloat closestDistance = MAXFLOAT;
     
-    NSInteger sections = [self numberOfSections];
-    
-    for (NSInteger section = 0; section < sections; section++) {
+    for (NSInteger section = 0; section < self.numberOfSections; section++) {
 
         NSInteger items = [self numberOfItemsInSection:section];
         
