@@ -23,6 +23,7 @@
 @interface PMCenteredCircularCollectionView : PMCircularCollectionView
 
 // Overwrite Type
+@property (nonatomic, retain) PMCenteredCollectionViewFlowLayout *collectionViewLayout;
 @property (nonatomic, assign) id <PMCenteredCircularCollectionViewDelegate> delegate;
 
 - (void) centerCell:(UICollectionViewCell *)cell animated:(BOOL)animated;

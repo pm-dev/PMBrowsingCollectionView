@@ -10,4 +10,6 @@
 
 @interface PMCenteredCollectionViewFlowLayout : UICollectionViewFlowLayout
 
+@property (nonatomic) BOOL centeringDisabled;
+
 @end

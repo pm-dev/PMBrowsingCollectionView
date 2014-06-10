@@ -22,7 +22,7 @@
 
 @interface PMBrowsingCollectionView : UICollectionView
 
-@property (nonatomic, retain) UICollectionViewFlowLayout *collectionViewLayout;
+@property (nonatomic, strong) UICollectionViewFlowLayout *collectionViewLayout;
 
 // Overwrite type for delegate;
 @property (nonatomic, assign) id <PMBrowsingCollectionViewDelegate> delegate;

@@ -17,8 +17,8 @@
     BOOL targetFirstIndexPath = CGPointEqualToPoint(proposedContentOffset, CGPointZero);
     BOOL targetLastIndexPath = (proposedContentOffset.x == self.collectionViewContentSize.width - self.collectionView.bounds.size.width &&
                                 proposedContentOffset.y == self.collectionViewContentSize.height - self.collectionView.bounds.size.height);
-
-    if ( !targetFirstIndexPath && !targetLastIndexPath) {
+	
+    if ( !_centeringDisabled && !targetFirstIndexPath && !targetLastIndexPath) {
 		
 		proposedContentOffset.x += self.collectionView.bounds.size.width / 2.0f;
 		proposedContentOffset.y += self.collectionView.bounds.size.height / 2.0f;
@@ -33,5 +33,6 @@
     }
     return [super targetContentOffsetForProposedContentOffset:proposedContentOffset withScrollingVelocity:velocity];
 }
+
 
 @end

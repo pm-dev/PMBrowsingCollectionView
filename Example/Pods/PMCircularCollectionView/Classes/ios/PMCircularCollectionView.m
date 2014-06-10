@@ -127,8 +127,10 @@ static NSUInteger const ContentMultiplier = 4;
 
 - (void) setCircularImplicitlyDisabled:(BOOL)circularImplicitlyDisabled
 {
-    _circularImplicitlyDisabled = circularImplicitlyDisabled;
-	[self _resetShadowLayer];
+	if (_circularImplicitlyDisabled != circularImplicitlyDisabled) {
+		_circularImplicitlyDisabled = circularImplicitlyDisabled;
+		[self _resetShadowLayer];
+	}
 }
 
 
@@ -196,9 +198,6 @@ static NSUInteger const ContentMultiplier = 4;
     
     _dataSourceInterceptor = [PMProtocolInterceptor interceptorWithMiddleMan:self forProtocol:@protocol(UICollectionViewDataSource)];
     [super setDataSource:(id)_dataSourceInterceptor];
-    
-	_shadowLayer = [CAGradientLayer layer];
-	[self.layer addSublayer:_shadowLayer];
 	
     self.showsHorizontalScrollIndicator = NO;
     self.showsVerticalScrollIndicator = NO;
@@ -249,9 +248,14 @@ static NSUInteger const ContentMultiplier = 4;
 {
     if (self.shadowRadius && self.shadowColor.alpha && [self circularActive]) {
         
+		if (!_shadowLayer) {
+			_shadowLayer = [CAGradientLayer layer];
+			[self.layer addSublayer:_shadowLayer];
+		}
+		
         UIColor *outerColor = self.shadowColor;
         UIColor *innerColor = [self.shadowColor colorWithAlphaComponent:0.0];
-        
+		
         _shadowLayer.frame = self.bounds;
         _shadowLayer.colors = @[(id)outerColor.CGColor, (id)innerColor.CGColor, (id)innerColor.CGColor, (id)outerColor.CGColor];
         _shadowLayer.anchorPoint = CGPointZero;
@@ -276,6 +280,7 @@ static NSUInteger const ContentMultiplier = 4;
         CGFloat location1 = self.shadowRadius / totalDistance;
         CGFloat location2 = 1.0f - location1;
         _shadowLayer.locations = @[@0.0, @(location1), @(location2), @1.0];
+		[_shadowLayer removeAllAnimations];
 		_shadowLayer.hidden = NO;
     }
 	else {

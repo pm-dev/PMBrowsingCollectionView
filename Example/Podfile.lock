@@ -6,7 +6,7 @@ PODS:
   - PMBrowsingCollectionView/PMStickyHeaderFlowLayout (0.0.5):
     - PMCircularCollectionView
     - PMUtils
-  - PMCircularCollectionView (0.0.26):
+  - PMCircularCollectionView (0.0.29):
     - PMUtils
   - PMUtils (0.0.47):
     - PMUtils/PMAnimationQueue
@@ -27,7 +27,7 @@ EXTERNAL SOURCES:
 
 SPEC CHECKSUMS:
   PMBrowsingCollectionView: 53177344fdc82feb979b372a805911e913094e1e
-  PMCircularCollectionView: d4484a6deb58ff7c9d8bb38e2c791977dcb832c4
+  PMCircularCollectionView: a750e442844044095c920286d94c3856710ff9ee
   PMUtils: 19833a18f7662002e8af24ee70208c7ff607f307
 
 COCOAPODS: 0.33.1
