@@ -98,6 +98,16 @@ static NSString * const PMBrowsingCollectionViewCellReuseIdentifier = @"PMBrowsi
     return [collectionView dequeueReusableCellWithReuseIdentifier:identifier forIndexPath:indexPathForSection];
 }
 
+- (void)reloadSections:(NSIndexSet *)sections
+{
+	[super reloadSections:sections];
+}
+
+- (void) setFrame:(CGRect)frame
+{
+	[super setFrame:frame];
+	NSAssert(CGSizeEqualToSize(CGSizeZero, self.contentSize), @"PMBrowsingCollectionView does not yet support resizing. This will come for free in iOS8 with dynamic cell sizing.");
+}
 
 #pragma mark - Accessors
 
@@ -152,7 +162,7 @@ static NSString * const PMBrowsingCollectionViewCellReuseIdentifier = @"PMBrowsi
     if ([self sectionExpanded:sectionIndex]) {
 		[_expandedSectionIndices removeIndex:sectionIndex];
 		[self reloadSections:[NSIndexSet indexSetWithIndex:sectionIndex]];
-		[self _centerSectionAtIndex:sectionIndex];
+		[self _centerSections];
     }
 }
 
@@ -413,14 +423,17 @@ minimumInteritemSpacingForSectionAtIndex:(NSInteger)section
 	return collapsedLayout;
 }
 
-- (void) _centerSectionAtIndex:(NSUInteger)sectionIndex
+- (void) _centerSections
 {
-	PMCenteredCircularCollectionView *collectionView = [self _collectionViewAtSectionIndex:sectionIndex];
-	if (collectionView.collectionViewLayout.centeringDisabled == NO) {
-		NSNumber *lastCenteredIndex = _lastCenteredIndexInSectionBySectionIndex[@(sectionIndex)];
-		NSInteger normalizedIndex = [collectionView normalizeIndex:[lastCenteredIndex integerValue]];
-		[collectionView centerCellAtIndex:normalizedIndex  animated:NO];
-	}
+	[_sectionCollectionViews enumerateObjectsUsingBlock:^(PMCenteredCircularCollectionView *collectionView, NSUInteger idx, BOOL *stop) {
+		
+		if (collectionView.collectionViewLayout.centeringDisabled == NO) {
+			
+			NSNumber *lastCenteredIndex = _lastCenteredIndexInSectionBySectionIndex[@(idx)];
+			NSInteger normalizedIndex = [collectionView normalizeIndex:[lastCenteredIndex integerValue]];
+			collectionView.centeredIndex = normalizedIndex;
+		}
+	}];
 }
 
 @end

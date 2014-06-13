@@ -1,22 +1,29 @@
 PODS:
-  - PMBrowsingCollectionView (0.0.5):
+  - PMBrowsingCollectionView (0.0.7):
     - PMBrowsingCollectionView/PMStickyHeaderFlowLayout
     - PMCircularCollectionView
     - PMUtils
-  - PMBrowsingCollectionView/PMStickyHeaderFlowLayout (0.0.5):
+  - PMBrowsingCollectionView/PMStickyHeaderFlowLayout (0.0.7):
     - PMCircularCollectionView
     - PMUtils
-  - PMCircularCollectionView (0.0.29):
+  - PMCircularCollectionView (0.0.32):
     - PMUtils
-  - PMUtils (0.0.47):
+  - PMUtils (0.0.56):
+    - PMUtils/Foundation+PMUtils
     - PMUtils/PMAnimationQueue
+    - PMUtils/PMImageFilmstrip
     - PMUtils/PMOrderedDictionary
     - PMUtils/PMPair
     - PMUtils/PMProtocolInterceptor
-  - PMUtils/PMAnimationQueue (0.0.47)
-  - PMUtils/PMOrderedDictionary (0.0.47)
-  - PMUtils/PMPair (0.0.47)
-  - PMUtils/PMProtocolInterceptor (0.0.47)
+    - PMUtils/UIKit+PMUtils
+  - PMUtils/Foundation+PMUtils (0.0.56)
+  - PMUtils/PMAnimationQueue (0.0.56)
+  - PMUtils/PMImageFilmstrip (0.0.56):
+    - PMUtils/UIKit+PMUtils
+  - PMUtils/PMOrderedDictionary (0.0.56)
+  - PMUtils/PMPair (0.0.56)
+  - PMUtils/PMProtocolInterceptor (0.0.56)
+  - PMUtils/UIKit+PMUtils (0.0.56)
 
 DEPENDENCIES:
   - PMBrowsingCollectionView (from `../PMBrowsingCollectionView.podspec`)
@@ -26,8 +33,8 @@ EXTERNAL SOURCES:
     :path: ../PMBrowsingCollectionView.podspec
 
 SPEC CHECKSUMS:
-  PMBrowsingCollectionView: 53177344fdc82feb979b372a805911e913094e1e
-  PMCircularCollectionView: a750e442844044095c920286d94c3856710ff9ee
-  PMUtils: 19833a18f7662002e8af24ee70208c7ff607f307
+  PMBrowsingCollectionView: 7b16a45f76f5024e76758d53fbfa306bdbbd1f93
+  PMCircularCollectionView: ee58c2e32d1fd89071e47f5097cba889b719d294
+  PMUtils: 83c3267bba01155224ed8d88e7410439fdafb158
 
 COCOAPODS: 0.33.1

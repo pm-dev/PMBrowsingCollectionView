@@ -38,7 +38,12 @@
     [_collectionView registerClass:[UICollectionReusableView class]
             forSupplementaryViewOfKind:UICollectionElementKindSectionHeader
                    withReuseIdentifier:[UICollectionReusableView defaultReuseIdentifier]];
-    [self.view addSubview:_collectionView];
+	[self.view addSubview:_collectionView];
+}
+
+- (BOOL) shouldAutorotate
+{
+	return NO;
 }
 
 

@@ -1,1 +1,1 @@
-../../PMUtils/Classes/ios/NSManagedObject+PMUtils.h
+../../PMUtils/Classes/ios/Foundation+PMUtils/NSManagedObject+PMUtils.h

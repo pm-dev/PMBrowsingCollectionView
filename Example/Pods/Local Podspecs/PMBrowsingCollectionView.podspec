@@ -1,11 +1,11 @@
 Pod::Spec.new do |s|
   s.name             = "PMBrowsingCollectionView"
-  s.version          = "0.0.5"
+  s.version          = "0.0.7"
   s.summary          = "This subclass of UICollectionView implements an easy interaction for easily browsing through a collection of cells."
-  s.homepage         = "https://github.com/petermeyers1/#{s.name}"
+  s.homepage         = "https://github.com/pm-dev/#{s.name}"
   s.license          = 'MIT'
   s.author           = { "Peter Meyers" => "petermeyers1@gmail.com" }
-  s.source           = { :git => "https://github.com/petermeyers1/#{s.name}.git", :tag => s.version.to_s }
+  s.source           = { :git => "https://github.com/pm-dev/#{s.name}.git", :tag => s.version.to_s }
   s.platform         = :ios, '7.0'
   s.ios.deployment_target = '7.0'
   s.requires_arc     = true

@@ -1,1 +1,1 @@
-../../PMUtils/Classes/ios/UIImage+PMUtils.h
+../../PMUtils/Classes/ios/UIKit+PMUtils/UIImage+PMUtils.h

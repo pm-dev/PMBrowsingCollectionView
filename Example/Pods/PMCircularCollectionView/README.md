@@ -1,24 +1,93 @@
 # PMCircularCollectionView
 
-[![Version](http://cocoapod-badges.herokuapp.com/v/PMCircularCollectionView/badge.png)](http://cocoadocs.org/docsets/PMCircularCollectionView)
-[![Platform](http://cocoapod-badges.herokuapp.com/p/PMCircularCollectionView/badge.png)](http://cocoadocs.org/docsets/PMCircularCollectionView)
+PMCircularCollectionView is a subclass of UICollectionView that scrolls infinitely in the horizontal or vertical direction. PMCircularCollectionView also includes a subclass which automatically centers the cell nearest to the middle of the collection view after scrolling.
+
+## Requirements & Notes
+
+- PMCircularCollectionView was built for iOS and requires a minimum iOS target of iOS 7.
+- Thorough commenting of header files is currently in progress. (6/11/14).
+- PMCircularCollectionView is currently lacking unit tests.
+
+## How To Get Started
+
+- Check out the documentation (coming soon).
+
+### Installation with CocoaPods
+
+[CocoaPods](http://cocoapods.org) is a dependency manager for Objective-C, which automates and simplifies the process of using 3rd-party libraries like PMCircularCollectionView in your projects. See the ["Getting Started" guide for more information](http://guides.cocoapods.org/using/getting-started.html).
+
+#### Podfile
+
+```ruby
+platform :ios, '7.0'
+pod "PMCircularCollectionView"
+```
 
 ## Usage
 
-To run the example project; clone the repo, and run `pod install` from the Example directory first.
 
-## Requirements
+### Creating a PMCircularCollectionView
 
-## Installation
+```objective-c
+PMCenteredCollectionViewFlowLayout *layout = [UICollectionViewFlowLayout new];
+layout.scrollDirection = UICollectionViewScrollDirectionHorizontal;
+layout.minimumLineSpacing = 10;	
+layout.minimumInteritemSpacing = 0;
 
-PMCircularCollectionView is available through [CocoaPods](http://cocoapods.org), to install
-it simply add the following line to your Podfile:
+PMCenteredCircularCollectionView *collectionView = [PMCircularCollectionView collectionViewWithFrame:self.view.bounds collectionViewLayout:layout];
+collectionView.delegate = self;
+collectionView.dataSource = self;
+```
 
-    pod "PMCircularCollectionView"
+### UICollectionViewDataSource
+
+```objective-c
+- (UICollectionViewCell *) collectionView:(PMCenteredCircularCollectionView *)collectionView cellForItemAtIndexPath:(NSIndexPath *)indexPath
+{
+    UICollectionViewCell *cell = [collectionView dequeueReusableCellWithReuseIdentifier:PMCellReuseIdentifier forIndexPath:indexPath];
+    NSInteger normalizedIndex = [collectionView normalizeIndex:indexPath.item];
+    /*
+    * Configure cell based on indexPath.section and normalizedIndex.
+    */
+}
+```
+
+### Creating a PMCenteredCircularCollectionView
+
+```objective-c
+PMCenteredCollectionViewFlowLayout *layout = [PMCenteredCollectionViewFlowLayout new];
+layout.centeringDisabled = NO;
+layout.scrollDirection = UICollectionViewScrollDirectionHorizontal;
+layout.minimumLineSpacing = 10;	
+layout.minimumInteritemSpacing = 0;
+
+PMCenteredCircularCollectionView *collectionView = [PMCenteredCircularCollectionView collectionViewWithFrame:self.view.bounds collectionViewLayout:layout];
+collectionView.delegate = self;
+collectionView.dataSource = self;
+```
+
+### PMCenteredCircularCollectionViewDelegate
+
+```objective-c
+- (void) collectionView:(PMCenteredCircularCollectionView *)collectionView didCenterItemAtIndex:(NSUInteger)index
+{
+    NSUInteger normalizedIndex = [collectionView normalizeIndex:index];
+	NSLog(@"Collection View: %@\nDid center item at index %d", collectionView, normalizedIndex);
+}
+```
+
+## Communication
+
+- If you **need help**, use [Stack Overflow](http://stackoverflow.com/questions/tagged/PMCircularCollectionView). (Tag 'PMCircularCollectionView')
+- If you'd like to **ask a general question**, use [Stack Overflow](http://stackoverflow.com/questions/tagged/PMCircularCollectionView).
+- If you **found a bug**, open an issue.
+- If you **have a feature request**, open an issue.
+- If you **want to contribute**, submit a pull request.
+
 
 ## Author
 
-Peter Meyers, petermeyers1@gmail.com
+- [Peter Meyers](mailto:petermeyers1@gmail.com)
 
 ## License
 

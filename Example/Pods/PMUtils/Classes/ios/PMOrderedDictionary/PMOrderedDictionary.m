@@ -20,6 +20,11 @@
 //  3. This notice may not be removed or altered from any source
 //     distribution.
 //
+//  Version: 1.1
+//  Created by PETER MEYERS on 6/11/2014.
+//  Copyright (c) 2013 Peter Meyers. All rights reserved.
+//  The original source code can be found at:
+//  http://projectswithlove.com/projects/OrderedDictionary.zip
 
 #import "PMOrderedDictionary.h"
 

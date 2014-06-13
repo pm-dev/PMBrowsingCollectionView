@@ -1,1 +1,1 @@
-../../PMUtils/Classes/ios/UICollectionView+PMUtils.h
+../../PMUtils/Classes/ios/UIKit+PMUtils/UICollectionView+PMUtils.h
