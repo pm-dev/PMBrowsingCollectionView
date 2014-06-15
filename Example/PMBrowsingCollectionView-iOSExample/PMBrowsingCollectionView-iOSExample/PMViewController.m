@@ -59,14 +59,14 @@
     return [UIColor colorWithWhite:0.2f alpha:0.9];
 }
 
-- (void) collectionView:(PMBrowsingCollectionView *)collectionView didCenterItemAtIndexPath:(NSIndexPath *)indexPath
+- (void) collectionView:(PMBrowsingCollectionView *)collectionView willCenterItemAtIndexPath:(NSIndexPath *)indexPath
 {
-    DLog(@"Centered Item at %@", indexPath);
+    DLog(@"Will center item at %@", indexPath);
 }
 
 - (void) collectionView:(PMBrowsingCollectionView *)collectionView didSelectItemAtIndexPath:(NSIndexPath *)indexPath
 {
-    DLog(@"Selected Item at %@", indexPath);
+    DLog(@"Selected item at %@", indexPath);
 }
 
 - (CGSize) collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout *)collectionViewLayout referenceSizeForHeaderInSection:(NSInteger)section

@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name             = "PMBrowsingCollectionView"
-  s.version          = "0.0.8"
+  s.version          = "0.0.9"
   s.summary          = "This subclass of UICollectionView implements an easy interaction for easily browsing through a collection of cells."
   s.homepage         = "https://github.com/pm-dev/#{s.name}"
   s.license          = 'MIT'

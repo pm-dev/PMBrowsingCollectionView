@@ -29,7 +29,7 @@
 @implementation PMCenteredCircularCollectionView
 {
     __weak id<PMCenteredCircularCollectionViewDelegate> _originalDelegate;
-    BOOL _delegateRespondsToDidCenterItemAtIndex;
+    BOOL _delegateRespondsToWillCenterItemAtIndex;
     BOOL _delegateRespondsToDidSelectItemAtIndexPath;
     BOOL _delegateRespondsToScrollViewDidEndDecelerating;
 }
@@ -64,7 +64,7 @@
     _originalDelegate = delegate;
     _delegateRespondsToScrollViewDidEndDecelerating = [delegate respondsToSelector:@selector(scrollViewDidEndDecelerating:)];
     _delegateRespondsToDidSelectItemAtIndexPath = [delegate respondsToSelector:@selector(collectionView:didSelectItemAtIndexPath:)];
-    _delegateRespondsToDidCenterItemAtIndex = [delegate respondsToSelector:@selector(collectionView:didCenterItemAtIndex:)];
+    _delegateRespondsToWillCenterItemAtIndex = [delegate respondsToSelector:@selector(collectionView:willCenterItemAtIndex:)];
 }
 
 
@@ -156,8 +156,8 @@
 					 atScrollPosition:UICollectionViewScrollPositionCenteredHorizontally | UICollectionViewScrollPositionCenteredVertically
 							 animated:animated];
 		
-		if (notifyDelegate && _delegateRespondsToDidCenterItemAtIndex) {
-			[_originalDelegate collectionView:self didCenterItemAtIndex:_centeredIndex];
+		if (notifyDelegate && _delegateRespondsToWillCenterItemAtIndex) {
+			[_originalDelegate collectionView:self willCenterItemAtIndex:_centeredIndex];
 		}
     }
 }

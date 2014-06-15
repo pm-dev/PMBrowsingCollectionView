@@ -30,7 +30,7 @@ static NSString * const PMBrowsingCollectionViewCellReuseIdentifier = @"PMBrowsi
     BOOL _delegateRespondsToSizeForItemAtIndexPath;
     BOOL _delegateImplementsShadowRadiusForSection;
     BOOL _delegateImplementsShadowColorForSection;
-    BOOL _delegateImplementsDidCenterItemAtIndexPath;
+    BOOL _delegateImplementsWillCenterItemAtIndexPath;
     BOOL _delegateImplementsDidSelectItemAtIndexPath;
     BOOL _delegateImplementsMinimumInteritemSpacingForSectionAtIndex;
     BOOL _delegateImplementsMinimumLineSpacingForSectionAtIndex;
@@ -130,7 +130,7 @@ static NSString * const PMBrowsingCollectionViewCellReuseIdentifier = @"PMBrowsi
     _delegateRespondsToSizeForItemAtIndexPath = [delegate respondsToSelector:@selector(collectionView:layout:sizeForItemAtIndexPath:)];
     _delegateImplementsShadowRadiusForSection = [delegate respondsToSelector:@selector(collectionView:shadowRadiusForSection:)];
     _delegateImplementsShadowColorForSection = [delegate respondsToSelector:@selector(collectionView:shadowColorForSection:)];
-    _delegateImplementsDidCenterItemAtIndexPath = [delegate respondsToSelector:@selector(collectionView:didCenterItemAtIndexPath:)];
+    _delegateImplementsWillCenterItemAtIndexPath = [delegate respondsToSelector:@selector(collectionView:willCenterItemAtIndexPath:)];
     _delegateImplementsDidSelectItemAtIndexPath = [delegate respondsToSelector:@selector(collectionView:didSelectItemAtIndexPath:)];
     _delegateImplementsMinimumLineSpacingForSectionAtIndex = [delegate respondsToSelector:@selector(collectionView:layout:minimumLineSpacingForSectionAtIndex:)];
     _delegateImplementsMinimumInteritemSpacingForSectionAtIndex = [delegate respondsToSelector:@selector(collectionView:layout:minimumInteritemSpacingForSectionAtIndex:)];
@@ -310,13 +310,13 @@ minimumInteritemSpacingForSectionAtIndex:(NSInteger)section
     }
 }
 
-- (void) collectionView:(PMCenteredCircularCollectionView *)collectionView didCenterItemAtIndex:(NSUInteger)index
+- (void) collectionView:(PMCenteredCircularCollectionView *)collectionView willCenterItemAtIndex:(NSUInteger)index
 {
 	NSUInteger sectionIndex = [self _sectionIndexOfCollectionView:collectionView];
 	_lastCenteredIndexInSectionBySectionIndex[@(sectionIndex)] = @(index);
-    if (_delegateImplementsDidCenterItemAtIndexPath) {
+    if (_delegateImplementsWillCenterItemAtIndexPath) {
         NSIndexPath *indexPath = [NSIndexPath indexPathForItem:index inSection:sectionIndex];
-        [_delegateInterceptor.receiver collectionView:self didCenterItemAtIndexPath:indexPath];
+        [_delegateInterceptor.receiver collectionView:self willCenterItemAtIndexPath:indexPath];
     }
 }
 

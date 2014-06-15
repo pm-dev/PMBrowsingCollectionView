@@ -15,7 +15,7 @@
 @optional
 - (CGFloat) collectionView:(PMBrowsingCollectionView *)collectionView shadowRadiusForSection:(NSInteger)section;
 - (UIColor *) collectionView:(PMBrowsingCollectionView *)collectionView shadowColorForSection:(NSInteger)section;
-- (void) collectionView:(PMBrowsingCollectionView *)collectionView didCenterItemAtIndexPath:(NSIndexPath *)indexPath;
+- (void) collectionView:(PMBrowsingCollectionView *)collectionView willCenterItemAtIndexPath:(NSIndexPath *)indexPath;
 
 @end
 
