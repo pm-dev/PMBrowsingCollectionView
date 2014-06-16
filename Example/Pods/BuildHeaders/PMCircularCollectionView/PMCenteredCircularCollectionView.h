@@ -1,0 +1,1 @@
+../../PMCircularCollectionView/Classes/ios/PMCenteredCircularCollectionView.h
