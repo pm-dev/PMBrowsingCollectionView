@@ -1,0 +1,3 @@
+xcodeproj 'PMBrowsingCollectionView-iOSExample/PMBrowsingCollectionView-iOSExample.xcodeproj'
+
+pod "PMBrowsingCollectionView", :path => "../PMBrowsingCollectionView.podspec"
