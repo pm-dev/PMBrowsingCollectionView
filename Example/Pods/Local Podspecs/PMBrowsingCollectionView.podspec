@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name             = "PMBrowsingCollectionView"
-  s.version          = "0.9.0"
+  s.version          = "0.9.1"
   s.summary          = "PMBrowsingCollectionView is a subclass of UICollectionView that introduces expanded vs. collapsed sections."
   s.homepage         = "https://github.com/pm-dev/#{s.name}"
   s.license          = 'MIT'
