@@ -64,15 +64,16 @@
 				UICollectionViewLayoutAttributes *nextHeaderAttributes = [super layoutAttributesForSupplementaryViewOfKind:kind atIndexPath:nextSection];
 				nextHeaderOrigin = nextHeaderAttributes.frame.origin;
 			}
-			
+
+            
 			CGRect frame = attributes.frame;
 			switch (self.scrollDirection) {
 				case UICollectionViewScrollDirectionHorizontal:
-					frame.origin.x = MIN(MAX(cv.contentOffset.x, frame.origin.x), nextHeaderOrigin.x - CGRectGetWidth(frame));
+					frame.origin.x = fminf(fmaxf(cv.contentOffset.x + cv.contentInset.left, frame.origin.x), nextHeaderOrigin.x - CGRectGetWidth(frame) - cv.contentInset.right);
 					break;
 					
 				case UICollectionViewScrollDirectionVertical:
-					frame.origin.y = MIN(MAX(cv.contentOffset.y, frame.origin.y), nextHeaderOrigin.y - CGRectGetHeight(frame));
+					frame.origin.y = fminf(fmaxf(cv.contentOffset.y + cv.contentInset.top, frame.origin.y), nextHeaderOrigin.y - CGRectGetHeight(frame) - cv.contentInset.bottom);
 					break;
 			}
 			
