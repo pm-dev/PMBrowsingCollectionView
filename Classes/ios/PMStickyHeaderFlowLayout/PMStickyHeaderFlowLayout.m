@@ -12,7 +12,7 @@
 
 - (NSArray *)layoutAttributesForElementsInRect:(CGRect)rect
 {
-	if (_stickyHeaderEndabled) {
+	if (_stickyHeaderEnabled) {
 		
 		NSMutableArray *attributes = [[super layoutAttributesForElementsInRect:rect] mutableCopy];
 		
@@ -48,7 +48,7 @@
 
 - (UICollectionViewLayoutAttributes *)layoutAttributesForSupplementaryViewOfKind:(NSString *)kind atIndexPath:(NSIndexPath *)indexPath
 {
-	if (_stickyHeaderEndabled) {
+	if (_stickyHeaderEnabled) {
 		
 		UICollectionViewLayoutAttributes *attributes = [super layoutAttributesForSupplementaryViewOfKind:kind atIndexPath:indexPath];
 		
@@ -88,7 +88,7 @@
 
 - (BOOL)shouldInvalidateLayoutForBoundsChange:(CGRect)newBound
 {
-	if (_stickyHeaderEndabled) {
+	if (_stickyHeaderEnabled) {
 		return YES;
 	}
 	return [super shouldInvalidateLayoutForBoundsChange:newBound];

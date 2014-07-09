@@ -9,6 +9,6 @@
 
 @interface PMStickyHeaderFlowLayout : UICollectionViewFlowLayout
 
-@property (nonatomic) BOOL stickyHeaderEndabled;
+@property (nonatomic) BOOL stickyHeaderEnabled;
 
 @end
